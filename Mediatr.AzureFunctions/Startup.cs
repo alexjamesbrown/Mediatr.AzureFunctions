@@ -16,6 +16,8 @@ namespace Mediatr.AzureFunctions
             builder.Services.AddTransient(typeof(IPipelineBehavior<,>), typeof(ValidationBehavior<,>));
 
             builder.Services.AddSingleton<IValidator<GetUserQuery>, GetUserQueryValidator>();
+
+            builder.Services.AddSingleton<IHttpFunctionExecutor, HttpFunctionExecutor>();
         }
     }
 }
