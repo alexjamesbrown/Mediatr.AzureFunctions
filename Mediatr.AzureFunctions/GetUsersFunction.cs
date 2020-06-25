@@ -13,10 +13,12 @@ namespace Mediatr.AzureFunctions
     public class GetUsersFunction
     {
         private readonly IMediator _mediator;
+        private readonly IHttpFunctionExecutor _httpFunctionExecutor;
 
-        public GetUsersFunction(IMediator mediator)
+        public GetUsersFunction(IMediator mediator, IHttpFunctionExecutor httpFunctionExecutor)
         {
             _mediator = mediator;
+            _httpFunctionExecutor = httpFunctionExecutor;
         }
 
         [FunctionName("GetUsersFunction")]
@@ -25,27 +27,11 @@ namespace Mediatr.AzureFunctions
             GetUserQuery getUserQuery,
             ILogger log)
         {
-            try
+            return await _httpFunctionExecutor.ExecuteAsync(async () =>
             {
                 var users = await _mediator.Send(getUserQuery);
                 return new OkObjectResult(users);
-            }
-            catch (ValidationException validationException)
-            {
-                var result = new
-                {
-                    message = "Validation failed.",
-                    errors = validationException.Errors.Select(x => new
-                    {
-
-                        x.PropertyName,
-                        x.ErrorMessage,
-                        x.ErrorCode
-                    })
-                };
-
-                return new BadRequestObjectResult(result);
-            }
+            });
         }
     }
 }
